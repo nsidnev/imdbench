@@ -18,3 +18,7 @@ node_modules
 /_prisma/.env
 venv*
 .python-version
+
+# elixir
+deps/
+_build/

@@ -120,6 +120,18 @@ IMPLEMENTATIONS = {
 
     'prisma':
         impl('js', 'Prisma', None),
+
+    'edgedb_ex':
+        impl('elixir', 'EdgeDB (Elixir)', None),
+
+    'edgedb_ex_json':
+        impl('elixir', 'EdgeDB (Elixir, JSON mode)', None),
+
+    'ecto_postgrex':
+        impl('elixir', 'Ecto (Elixir, Postgrex)', None),
+
+    'postgres_postgrex':
+        impl('elixir', 'PostgreSQL (Elixir, Postgrex)', None),
 }
 
 

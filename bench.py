@@ -239,6 +239,10 @@ def run_benchmarks(args, argv):
             lang_args['js'] = [
                 'python', 'bench_js.py', '--json', '__tmp.json'
             ] + argv
+        elif bench.language == 'elixir':
+            lang_args['elixir'] = [
+                'python', 'bench_elixir.py', '--json', '__tmp.json'
+            ] + argv
         else:
             raise ValueError('unsupported host language: {}'.format(
                 bench.language))

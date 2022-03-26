@@ -281,8 +281,21 @@ load-sequelize: $(BUILD)/dataset.json docker-postgres
 
 	cd _sequelize && npm i && node loaddata.js $(BUILD)/dataset.json
 
+load-ecto: $(BUILD)/dataset.json docker-postgres
+	$(PSQL_CMD) -tc \
+		"DROP DATABASE IF EXISTS ecto_bench;"
+	$(PSQL_CMD) -tc \
+		"DROP ROLE IF EXISTS ecto_bench;"
+	$(PSQL_CMD) -tc \
+		"CREATE ROLE ecto_bench WITH \
+			LOGIN ENCRYPTED PASSWORD 'edgedbbenchmark';"
+	$(PSQL_CMD) -tc \
+		"CREATE DATABASE ecto_bench WITH OWNER = ecto_bench;"
+
+	cd _elixir && mix ecto.setup $(BUILD)/dataset.json
+
 load: load-mongodb load-edgedb load-django load-sqlalchemy load-postgres \
-	  load-typeorm load-sequelize load-prisma load-graphql
+	  load-typeorm load-sequelize load-prisma load-graphql load-ecto
 
 load-graphql: load-hasura load-postgraphile
 
@@ -290,6 +303,9 @@ compile:
 	make -C _go
 
 RUNNER = python bench.py --query insert_movie --query get_movie --query get_user --concurrency 1 --duration 10 --net-latency 1
+
+run-ex:
+	$(RUNNER) --html docs/ex.html --json docs/ex.json postgres_postgrex ecto_postgrex edgedb_ex edgedb_ex_json
 
 run-js:
 	$(RUNNER) --html docs/js.html --json docs/js.json typeorm sequelize prisma edgedb_js_qb
@@ -307,7 +323,7 @@ run-orms:
 	$(RUNNER) --html docs/orms.html --json docs/orms.json typeorm sequelize prisma edgedb_js_qb django django_restfw mongodb sqlalchemy
 
 run-edgedb:
-	$(RUNNER) --html docs/edgedb.html --json docs/edgedb.json edgedb_py_sync edgedb_py_json edgedb_py_json_async edgedb_go edgedb_go_json edgedb_go_graphql edgedb_go_http edgedb_js edgedb_js_json edgedb_js_qb
+	$(RUNNER) --html docs/edgedb.html --json docs/edgedb.json edgedb_py_sync edgedb_py_json edgedb_py_json_async edgedb_go edgedb_go_json edgedb_go_graphql edgedb_go_http edgedb_js edgedb_js_json edgedb_js_qb edgedb_ex edgedb_ex_json
 
 run-scratch:
 	python bench.py --query insert_movie --concurrency 1 --warmup-time 2 --duration 5 --html docs/scratch.html edgedb_go
